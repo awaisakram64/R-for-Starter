@@ -1,0 +1,117 @@
+---
+title: "BDA Help"
+author: "awaisakram"
+date: "5/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is R markdown. First of all download and install few things like [R for Windows](https://cran.r-project.org/bin/windows/base/old/3.4.3/ "R Homepage") and [R Studio](https://www.rstudio.com/products/rstudio/download/#download). First install R and then R Studio. After Installation open R studio and Create New Project and in this new project Create new file and name it as <filename>.R and save this file in working directory.
+Download any dataset and from [Kaggle](https://kaggle.com) and paste it in worikng directory/Project main folder.
+
+Now open your file with name <filename>.R and start writing code.
+
+
+```{r}
+# install libraries
+
+# install.packages('caret') 
+#install.packages('e1071')
+#install.packages('AUC')
+
+# and import libraries using
+
+library(caret)
+library(e1071)
+library(AUC)
+```
+
+## Read Dataset
+
+now read dataset in R that you download from kaggle, for example:
+
+There are two csv files in working dir 
+1) Credit_test.csv  
+2) Credit_train.csv
+```{r}
+dir('./')
+```
+
+read Train and test data
+```{r}
+train <- read.csv("Credit_train.csv")
+test <- read.csv("Credit_test.csv")
+```
+
+
+
+Columns name 
+target variable is "~DEFAULT"
+```{r}
+colnames(train)
+colnames(test)
+```
+
+Show  head of datasets
+```{r}
+head(train)
+head(test)
+```
+# Algorithms on Dataset 
+## Naive Bayesian
+
+"model.Bayes" is training model that train on training dataset 
+```{r}
+model.Bayes <- naiveBayes(DEFAULT~., data = train)
+model.Bayes
+```
+
+now find out the prediction of test data using training model "model.Bayes"
+```{r}
+pc <- predict(model.Bayes, test, type = "class")
+# Summary of prediction 
+summary(pc)
+
+
+```
+
+finding accuracy of model using confusion Matrix
+```{r}
+xtab <- table(pc, test$DEFAULT)
+caret::confusionMatrix(xtab, positive = "Y")
+```
+
+## K Nearest Neighbors
+on same dataset
+
+```{r}
+# import libraries
+
+library(caret)
+library(kknn)
+library(AUC)
+
+
+#remove all records with missing values
+train <- na.omit(train)
+test <- na.omit(test)
+
+
+#train model
+model.KNN <- kknn(DEFAULT~., train, test, k=5, distance = 2, scale=FALSE)
+
+
+# Prediction using train model on test dataset
+pc <- predict(model.KNN, test, type="raw")
+# Summary of prediction
+summary(pc)
+
+# confusion matrix for accuracy
+xtab <- table(pc, test$DEFAULT)
+caret::confusionMatrix(xtab, positive="Y")
+```
